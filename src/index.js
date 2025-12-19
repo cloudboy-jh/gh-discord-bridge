@@ -7,6 +7,10 @@ export default {
 		const payload = await request.json();
 		const event = request.headers.get('x-github-event');
 
+		if (!event) {
+			return new Response('missing x-github-event header', { status: 400 });
+		}
+
 		if (event === 'ping') {
 			return new Response('pong');
 		}
@@ -31,6 +35,10 @@ export default {
 		}
 
 		const message = `**${event}**${action} on \`${repo}\` by ${sender}${detail ? '\n' + detail : ''}`;
+
+		if (!message.trim()) {
+			return new Response('empty message, skipping', { status: 200 });
+		}
 
 		await fetch(env.DISCORD_WEBHOOK, {
 			method: 'POST',
