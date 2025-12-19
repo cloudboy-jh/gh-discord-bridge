@@ -40,12 +40,15 @@ export default {
 			return new Response('empty message, skipping', { status: 200 });
 		}
 
-		await fetch(env.DISCORD_WEBHOOK, {
+		const body = JSON.stringify({ content: message });
+		
+		const resp = await fetch(env.DISCORD_WEBHOOK, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ content: message }),
+			body,
 		});
 
-		return new Response('ok');
+		const discordResponse = await resp.text();
+		return new Response(`Sent: ${body}\nDiscord: ${discordResponse}`, { status: resp.ok ? 200 : 502 });
 	},
 };
