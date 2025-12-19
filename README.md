@@ -1,4 +1,4 @@
-# gh-bridge
+# gh-discord-bridge
 
 A Cloudflare Worker that forwards GitHub webhook events to Discord.
 
