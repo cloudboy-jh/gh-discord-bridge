@@ -28,12 +28,24 @@ When prompted, paste your Discord webhook URL (e.g., `https://discord.com/api/we
 4. Select which events to receive (or choose "Send me everything")
 5. Save
 
-## Supported Events
+## Notifications
 
-- **push** - Commits pushed to a branch
-- **pull_request** - PR opened, closed, merged, etc.
-- **issues** - Issue opened, closed, etc.
-- **release** - New releases published
-- **star** - Repository starred
+Compact, repo-first Discord embeds with clickable headlines and event-colored borders. Your own activity is included; repeated actor names are omitted except for stars.
 
-Other events will still be forwarded with basic info (event type, repo, sender).
+- **Push:** branch, commit count, and up to five linked short SHAs with commit subjects. Extra commits link to the full comparison. Commit bodies are omitted.
+- **Pull request:** action, number, and title. Merged and closed PRs are distinct.
+- **Issue:** action, number, and title.
+- **Release:** action, tag, and release title without duplicate tags or release notes.
+- **Star:** actor and total star count.
+
+Branch/tag creation, deletion, and force-pushes get explicit headlines. Other events retain basic notifications with readable event/action text and a repository or comment link.
+
+Text is bounded to Discord embed limits, commit subjects are Markdown-escaped, and notifications disable mentions.
+
+## Tests
+
+Requires Node.js 22 or newer. No dependencies or Discord credentials needed.
+
+```bash
+npm test
+```

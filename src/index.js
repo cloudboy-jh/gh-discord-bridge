@@ -1,3 +1,5 @@
+import { formatMessage } from './format.js';
+
 export default {
 	async fetch(request, env) {
 		if (request.method !== 'POST') {
@@ -15,32 +17,7 @@ export default {
 			return new Response('pong');
 		}
 
-		const repo = payload.repository?.full_name || 'unknown';
-		const sender = payload.sender?.login || 'ghost';
-		const action = payload.action ? ` (${payload.action})` : '';
-
-		let detail = '';
-		if (event === 'push') {
-			const count = payload.commits?.length || 0;
-			const branch = payload.ref?.replace('refs/heads/', '');
-			detail = `${count} commit(s) to \`${branch}\``;
-		} else if (event === 'pull_request') {
-			detail = `PR #${payload.number}: ${payload.pull_request?.title}`;
-		} else if (event === 'issues') {
-			detail = `Issue #${payload.issue?.number}: ${payload.issue?.title}`;
-		} else if (event === 'release') {
-			detail = `Release: ${payload.release?.tag_name}`;
-		} else if (event === 'star') {
-			detail = `⭐ ${payload.repository?.stargazers_count} total`;
-		}
-
-		const message = `**${event}**${action} on \`${repo}\` by ${sender}${detail ? '\n' + detail : ''}`;
-
-		if (!message.trim()) {
-			return new Response('empty message, skipping', { status: 200 });
-		}
-
-		const body = JSON.stringify({ content: message });
+		const body = JSON.stringify(formatMessage(event, payload));
 		
 		const resp = await fetch(env.DISCORD_WEBHOOK, {
 			method: 'POST',
@@ -48,7 +25,7 @@ export default {
 			body,
 		});
 
-		const discordResponse = await resp.text();
-		return new Response(`Sent: ${body}\nDiscord: ${discordResponse}`, { status: resp.ok ? 200 : 502 });
+		await resp.body?.cancel();
+		return new Response(resp.ok ? 'sent' : 'discord delivery failed', { status: resp.ok ? 200 : 502 });
 	},
 };

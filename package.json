@@ -1,0 +1,8 @@
+{
+  "name": "gh-discord-bridge",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}
